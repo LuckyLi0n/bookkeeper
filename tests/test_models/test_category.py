@@ -28,7 +28,7 @@ def test_create_object():
 
 def test_reassign():
     """
-    class should not be frozen
+    атрибуты класса могут быть изменены
     """
     c = Category('name')
     c.name = 'test'
@@ -39,7 +39,7 @@ def test_reassign():
 
 def test_eq():
     """
-    class should implement __eq__ method
+    класс реализует метод __eq__, объекты могут быть сравнены
     """
     c1 = Category(name='name', parent=1, pk=2)
     c2 = Category(name='name', parent=1, pk=2)
@@ -47,6 +47,9 @@ def test_eq():
 
 
 def test_get_parent(repo):
+    """
+    родительская категория может быть получена
+    """
     c1 = Category(name='parent')
     pk = repo.add(c1)
     c2 = Category(name='name', parent=pk)
@@ -55,6 +58,9 @@ def test_get_parent(repo):
 
 
 def test_get_all_parents(repo):
+    """
+    могут быть получены все родительские категории
+    """
     parent_pk = None
     for i in range(5):
         c = Category(str(i), parent=parent_pk)
