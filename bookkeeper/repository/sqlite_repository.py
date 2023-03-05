@@ -14,7 +14,7 @@ class SQLiteRepository(AbstractRepository[T]):
     Репозиторий, работающий c базой данных SQLite и хранящий в ней данные.
     """
 
-    def __init__(self, db_file: str, cls: type) -> None:
+    def __init__(self, db_file: str, cls: type) -> None:  # TODO: создание таблиц, если они не существуют
         self.db_file = db_file
         self.table_name = cls.__name__.lower()
         self.fields = get_annotations(cls, eval_str=True)
@@ -39,7 +39,7 @@ class SQLiteRepository(AbstractRepository[T]):
         with sqlite3.connect(self.db_file) as con:
             cur = con.cursor()
             cur.execute(
-                f'SELECT * FROM {self.table_name} ' + f'WHERE ROWID=={pk}'
+                f'SELECT * FROM {self.table_name} WHERE ROWID=={pk}'
             )
             res = cur.fetchall()
         con.close()
@@ -64,12 +64,15 @@ class SQLiteRepository(AbstractRepository[T]):
         return res
 
     def update(self, obj: T) -> None:
-        fields = ", ".join([f"{f}" for f in self.fields.keys()])
+        if obj.pk == 0:
+            raise ValueError('attempt to update object with unknown primary key')
+
+        fields = ", ".join([f"{f}=?" for f in self.fields.keys()])
         values = [getattr(obj, f) for f in self.fields]
         with sqlite3.connect(self.db_file) as con:
             cur = con.cursor()
             cur.execute(
-                f'UPDATE {self.table_name} SET {fields} ' + f'WHERE ROWID=={obj.pk}', values
+                f'UPDATE {self.table_name} SET {fields} WHERE ROWID=={obj.pk}', values
             )
         con.close()
 
@@ -77,7 +80,7 @@ class SQLiteRepository(AbstractRepository[T]):
         with sqlite3.connect(self.db_file) as con:
             cur = con.cursor()
             cur.execute(
-                f'DELETE FROM  {self.table_name} ' + f'WHERE ROWID=={pk}'
+                f'DELETE FROM {self.table_name} WHERE ROWID=={pk}'
             )
             # TODO: рассмотреть возможные ошибки delete
         con.close()
