@@ -1,21 +1,7 @@
-from PySide6 import QtCore, QtWidgets
+from PySide6 import QtWidgets
 from PySide6.QtWidgets import QVBoxLayout, QLabel, QWidget, QGridLayout, QComboBox, QLineEdit, QPushButton
 
-
-class TableModel(QtCore.QAbstractTableModel):
-    def __init__(self, data):
-        super(TableModel, self).__init__()
-        self._data = data
-
-    def data(self, index, role):
-        if role == QtCore.Qt.DisplayRole:
-            return self._data[index.row()][index.column()]
-
-    def rowCount(self, index):
-        return len(self._data)
-
-    def columnCount(self, index):
-        return len(self._data[0])
+from bookkeeper.view.Table_model import TableModel
 
 
 class ExpenseWidget(QtWidgets.QMainWindow):
@@ -61,8 +47,9 @@ class ExpenseWidget(QtWidgets.QMainWindow):
         self.setCentralWidget(self.widget)
 
     def set_expense_table(self, data):
-        self.item_model = TableModel(data)
-        self.expenses_grid.setModel(self.item_model)
+        if data:
+            self.item_model = TableModel(data)
+            self.expenses_grid.setModel(self.item_model)
 
     def set_category_dropdown(self, data):
         for tup in data:

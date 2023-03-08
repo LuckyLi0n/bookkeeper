@@ -3,7 +3,7 @@
 """
 
 import sqlite3
-
+from typing import Any
 from inspect import get_annotations
 
 from bookkeeper.repository.abstract_repository import AbstractRepository, T
@@ -59,7 +59,7 @@ class SQLiteRepository(AbstractRepository[T]):
         obj.pk = pk
         return obj
 
-    def get_all(self, where: dict[str, any] | None = None) -> list[T]:
+    def get_all(self, where: dict[str, Any] | None = None) -> list[T]:
         """
         Получить все записи по некоторому условию
         where - условие в виде словаря {'название_поля': значение}
