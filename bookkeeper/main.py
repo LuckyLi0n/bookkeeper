@@ -21,8 +21,7 @@ if __name__ == '__main__':
     expense_repo = SQLiteRepository[Expense](DB_NAME, Expense)
     budget_repo = SQLiteRepository[Budget](DB_NAME, Budget)
 
-    cat_repo = SQLiteRepository[Category](db_file=DB_NAME, cls=Category)
-    if len(cat_repo.get_all()) == 0:
+    if len(category_repo.get_all()) == 0:
         cats = '''
                 продукты
                     мясо
@@ -50,7 +49,7 @@ if __name__ == '__main__':
                 товары для дома
                 лекарства
                 '''.splitlines()
-        Category.create_from_tree(read_tree(cats), cat_repo)
+        Category.create_from_tree(read_tree(cats), category_repo)
 
     window = ExpensePresenter(model, view, category_repo, expense_repo)
     window.show()
