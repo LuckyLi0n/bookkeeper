@@ -33,6 +33,8 @@ class SQLiteRepository(AbstractRepository[T]):
         con.close()
 
     def add(self, obj: T) -> int:
+        if getattr(obj, 'pk', None) != 0:
+            raise ValueError(f'trying to add object {obj} with filled `pk` attribute')
         names = ', '.join(self.fields.keys())
         p = ', '.join("?" * len(self.fields))
         values = [getattr(obj, x) for x in self.fields]
@@ -55,8 +57,11 @@ class SQLiteRepository(AbstractRepository[T]):
             )
             res = cur.fetchall()
         con.close()
-        obj = self.obj_cls(**dict(zip(self.fields, res)))
-        obj.pk = pk
+        if not res:
+            return None
+        else:
+            obj = self.obj_cls(res)
+            obj.pk = pk
         return obj
 
     def get_all(self, where: dict[str, Any] | None = None) -> list[T]:
@@ -99,7 +104,8 @@ class SQLiteRepository(AbstractRepository[T]):
             raise ValueError('attempt to delete object with unknown primary key')
         with sqlite3.connect(self.db_file) as con:
             cur = con.cursor()
-            cur.execute(
-                f'DELETE FROM {self.table_name} WHERE ROWID=={pk}'
-            )
+            if not cur.execute(f'SELECT * FROM {self.table_name} WHERE ROWID=={pk}').fetchall():
+                raise KeyError
+            else:
+                cur.execute(f'DELETE FROM {self.table_name} WHERE ROWID=={pk}')
         con.close()
