@@ -14,11 +14,23 @@ class SQLiteRepository(AbstractRepository[T]):
     Репозиторий, работающий c базой данных SQLite и хранящий в ней данные.
     """
 
-    def __init__(self, db_file: str, cls: type) -> None:  # TODO: создание таблиц, если они не существуют
+    def __init__(self, db_file: str, cls: type) -> None:
         self.db_file = db_file
         self.table_name = cls.__name__.lower()
         self.fields = get_annotations(cls, eval_str=True)
         self.fields.pop('pk')
+        self.obj_cls = cls
+
+        with sqlite3.connect(self.db_file) as con:
+            cur = con.cursor()
+            res = cur.execute('SELECT name FROM sqlite_master')
+            db_tables = [t[0].lower() for t in res.fetchall()]
+            if self.table_name not in db_tables:
+                col_names = ', '.join(self.fields.keys())
+                q = f'CREATE TABLE {self.table_name} (' \
+                    f'"pk" INTEGER PRIMARY KEY AUTOINCREMENT, {col_names})'
+                cur.execute(q)
+        con.close()
 
     def add(self, obj: T) -> int:
         names = ', '.join(self.fields.keys())
@@ -43,7 +55,9 @@ class SQLiteRepository(AbstractRepository[T]):
             )
             res = cur.fetchall()
         con.close()
-        return res  # TODO: исправить тип возвращаемого объекта
+        obj = self.obj_cls(**dict(zip(self.fields, res)))
+        obj.pk = pk
+        return obj
 
     def get_all(self, where: dict[str, any] | None = None) -> list[T]:
         """
@@ -59,7 +73,11 @@ class SQLiteRepository(AbstractRepository[T]):
                 )
                 res = cur.fetchall()
             else:
-                pass    # TODO: добавить блок WHERE
+                fields = " AND ".join([f"{f} LIKE ?" for f in where.keys()])
+                cur.execute(
+                    f'SELECT ROWID, * FROM {self.table_name} ' + f'WHERE {fields}',
+                    list(where.values()))
+                res = cur.fetchall()
         con.close()
         return res
 
@@ -77,10 +95,11 @@ class SQLiteRepository(AbstractRepository[T]):
         con.close()
 
     def delete(self, pk: int) -> None:
+        if pk == 0:
+            raise ValueError('attempt to delete object with unknown primary key')
         with sqlite3.connect(self.db_file) as con:
             cur = con.cursor()
             cur.execute(
                 f'DELETE FROM {self.table_name} WHERE ROWID=={pk}'
             )
-            # TODO: рассмотреть возможные ошибки delete
         con.close()
