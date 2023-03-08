@@ -48,6 +48,15 @@ class SQLiteRepository(AbstractRepository[T]):
         con.close()
         return obj.pk
 
+    def list_tup_to_t(self, res: list) -> T | None:
+        if not res:
+            return None
+        else:
+            pk = res[0][0]
+            obj = self.obj_cls(res)
+            obj.pk = pk
+            return obj
+
     def get(self, pk: int) -> T | None:
         """ Получить объект по id """
         with sqlite3.connect(self.db_file) as con:
@@ -57,12 +66,7 @@ class SQLiteRepository(AbstractRepository[T]):
             )
             res = cur.fetchall()
         con.close()
-        if not res:
-            return None
-        else:
-            obj = self.obj_cls(res)
-            obj.pk = pk
-        return obj
+        return self.list_tup_to_t(res)
 
     def get_all(self, where: dict[str, Any] | None = None) -> list[T]:
         """
@@ -73,16 +77,14 @@ class SQLiteRepository(AbstractRepository[T]):
         with sqlite3.connect(self.db_file) as con:
             cur = con.cursor()
             if where is None:
-                cur.execute(
+                res = cur.execute(
                     f'SELECT * FROM {self.table_name}'
-                )
-                res = cur.fetchall()
+                ).fetchall()
             else:
                 fields = " AND ".join([f"{f} LIKE ?" for f in where.keys()])
-                cur.execute(
+                res = cur.execute(
                     f'SELECT ROWID, * FROM {self.table_name} ' + f'WHERE {fields}',
-                    list(where.values()))
-                res = cur.fetchall()
+                    list(where.values())).fetchall()
         con.close()
         return res
 

@@ -1,4 +1,4 @@
-from bookkeeper.repository.sqlite_repository import SQLiteRepository  # CustomClass
+from bookkeeper.repository.sqlite_repository import SQLiteRepository
 from dataclasses import dataclass
 import pytest
 

@@ -10,10 +10,11 @@ def repo():
 
 
 def test_create_with_full_args_list():
-    b = Budget(amount=100, category=1, time=7, pk=1)
+    b = Budget(amount=100, category=1, time=7, limit=1000, pk=1)
     assert b.amount == 100
     assert b.category == 1
     assert b.time == 7
+    assert b.limit == 1000
 
 
 def test_create_brief():
