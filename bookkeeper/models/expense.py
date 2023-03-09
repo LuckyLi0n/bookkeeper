@@ -23,3 +23,6 @@ class Expense:
     added_date: datetime = field(default_factory=datetime.now)
     comment: str = ''
     pk: int = 0
+
+    def convert_to_list(self):
+        return[self.pk, self.amount, self.category, self.expense_date, self.added_date, self.comment]

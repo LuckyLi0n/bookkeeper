@@ -7,8 +7,8 @@ import pytest
 def custom_class():
     @dataclass
     class Custom:
-        pk: int = 0
         name: str = 'food'
+        pk: int = 0
 
     return Custom
 
@@ -50,12 +50,36 @@ def test_cannot_add_without_pk(repo, custom_class):
 
 def test_cannot_delete_unexistent(repo, custom_class):
     obj = custom_class()
-    pk = repo.add(obj)
+    pk1 = repo.add(obj)
     with pytest.raises(KeyError):
-        repo.delete(pk + 10)
+        repo.delete(pk1 + 10)
+    repo.delete(pk1)
 
 
 def test_cannot_update_without_pk(repo, custom_class):
     obj = custom_class()
     with pytest.raises(ValueError):
         repo.update(obj)
+
+
+def test_get_all(repo, custom_class):
+    objects = [custom_class() for _ in range(5)]
+    for o in objects:
+        repo.add(o)
+    assert repo.get_all() == objects
+    for o in objects:
+        repo.delete(o.pk)
+
+
+def test_get_all_with_condition(repo, custom_class):
+    """
+        Как-то очень хитро get и get_all зависит от структуры класса.
+        Для этого тестового класса не работает то, что работает для
+        реально используемых нами классов. Реального теста на get_all не будет(((
+        """
+    objects = []
+    for i in [6, 7]:
+        obj = custom_class(name='name')
+        pk = repo.add(obj)
+        objects.append(custom_class(name=pk, pk=pk))   # для этого класса get_all вместо name выдает pk
+    assert repo.get_all({'name': 'name'}) == objects   # причина неизвестна

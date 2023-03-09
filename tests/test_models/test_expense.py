@@ -28,3 +28,15 @@ def test_can_add_to_repo(repo):
     e = Expense(100, 1)
     pk = repo.add(e)
     assert e.pk == pk
+
+
+def test_convert_to_list():
+    amount = 100
+    category = 1
+    expense_date = datetime.now()
+    added_date = datetime.now()
+    comment = 'test'
+    pk = 1
+    e = Expense(amount=amount, category=category, expense_date=expense_date,
+                added_date=added_date, comment=comment, pk=pk)
+    assert e.convert_to_list() == [pk, amount, category, expense_date, added_date, comment]

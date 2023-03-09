@@ -28,7 +28,7 @@ def test_create_object():
 
 def test_reassign():
     """
-    атрибуты класса могут быть изменены
+    Атрибуты класса могут быть изменены
     """
     c = Category('name')
     c.name = 'test'
@@ -39,7 +39,7 @@ def test_reassign():
 
 def test_eq():
     """
-    класс реализует метод __eq__, объекты могут быть сравнены
+    Класс реализует метод __eq__, объекты могут быть сравнены
     """
     c1 = Category(name='name', parent=1, pk=2)
     c2 = Category(name='name', parent=1, pk=2)
@@ -48,7 +48,7 @@ def test_eq():
 
 def test_get_parent(repo):
     """
-    родительская категория может быть получена
+    Родительская категория может быть получена
     """
     c1 = Category(name='parent')
     pk = repo.add(c1)
@@ -59,7 +59,7 @@ def test_get_parent(repo):
 
 def test_get_all_parents(repo):
     """
-    могут быть получены все родительские категории
+    Могут быть получены все родительские категории
     """
     parent_pk = None
     for i in range(5):
@@ -112,3 +112,11 @@ def test_create_from_tree_error(repo):
     tree = [('1', 'parent'), ('parent', None)]
     with pytest.raises(KeyError):
         Category.create_from_tree(tree, repo)
+
+
+def test_convert_to_list():
+    name = 'name'
+    parent = 1
+    pk = 2
+    c = Category(name=name, parent=parent, pk=pk)
+    assert c.convert_to_list() == [pk, name, parent]

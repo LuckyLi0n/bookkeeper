@@ -33,6 +33,7 @@ class SQLiteRepository(AbstractRepository[T]):
         con.close()
 
     def add(self, obj: T) -> int:
+        """ Добавляет объект в базу данных """
         if getattr(obj, 'pk', None) != 0:
             raise ValueError(f'trying to add object {obj} with filled `pk` attribute')
         names = ', '.join(self.fields.keys())
@@ -48,15 +49,6 @@ class SQLiteRepository(AbstractRepository[T]):
         con.close()
         return obj.pk
 
-    def list_tup_to_t(self, res: list) -> T | None:
-        if not res:
-            return None
-        else:
-            pk = res[0][0]
-            obj = self.obj_cls(res)
-            obj.pk = pk
-            return obj
-
     def get(self, pk: int) -> T | None:
         """ Получить объект по id """
         with sqlite3.connect(self.db_file) as con:
@@ -66,7 +58,13 @@ class SQLiteRepository(AbstractRepository[T]):
             )
             res = cur.fetchall()
         con.close()
-        return self.list_tup_to_t(res)
+        if not res:
+            return None
+        else:
+            kwargs = dict(zip(self.fields, res[1:]))
+            obj = self.obj_cls(**kwargs)
+            obj.pk = pk
+            return obj
 
     def get_all(self, where: dict[str, Any] | None = None) -> list[T]:
         """
@@ -77,18 +75,22 @@ class SQLiteRepository(AbstractRepository[T]):
         with sqlite3.connect(self.db_file) as con:
             cur = con.cursor()
             if where is None:
-                res = cur.execute(
-                    f'SELECT * FROM {self.table_name}'
-                ).fetchall()
+                res_s = cur.execute(f'SELECT * FROM {self.table_name}').fetchall()
             else:
                 fields = " AND ".join([f"{f} LIKE ?" for f in where.keys()])
-                res = cur.execute(
+                res_s = cur.execute(
                     f'SELECT ROWID, * FROM {self.table_name} ' + f'WHERE {fields}',
                     list(where.values())).fetchall()
-        con.close()
-        return res
+        obj_s = []
+        for res in res_s:
+            kwargs = dict(zip(self.fields, res[1:]))
+            obj = self.obj_cls(**kwargs)
+            obj.pk = res[0]
+            obj_s.append(obj)
+        return obj_s
 
     def update(self, obj: T) -> None:
+        """ Заменить объект по id """
         if obj.pk == 0:
             raise ValueError('attempt to update object with unknown primary key')
 
@@ -102,6 +104,7 @@ class SQLiteRepository(AbstractRepository[T]):
         con.close()
 
     def delete(self, pk: int) -> None:
+        """ Удалить объект по id """
         if pk == 0:
             raise ValueError('attempt to delete object with unknown primary key')
         with sqlite3.connect(self.db_file) as con:

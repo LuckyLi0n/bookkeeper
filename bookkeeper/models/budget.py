@@ -12,10 +12,11 @@ class Budget:
     amount - сумма
     category - id категории расходов
     time - промежуток времени в днях
+    budget_day - бюджет на день
     pk - id записи в базе данных
     """
     amount: int
     category: int
     time: int
-    limit: int = 0
+    budget_day: int = 0
     pk: int = 0
