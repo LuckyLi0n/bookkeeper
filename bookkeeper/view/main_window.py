@@ -1,8 +1,6 @@
-from PySide6 import QtWidgets
 from PySide6.QtWidgets import QVBoxLayout
 
 from bookkeeper.view.expense_view import ExpenseWidget
-from bookkeeper.view.budget_view import BudgetWidget
 
 
 class MainWindow(ExpenseWidget):
