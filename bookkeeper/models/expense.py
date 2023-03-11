@@ -23,4 +23,4 @@ class Expense:
     pk: int = 0
 
     def convert_to_list(self):
-        return[self.pk, self.amount, self.category, self.expense_date, self.added_date, self.comment]
+        return[self.pk, self.amount, self.category, self.expense_date, self.comment]
