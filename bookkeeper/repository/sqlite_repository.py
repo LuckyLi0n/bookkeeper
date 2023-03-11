@@ -27,9 +27,9 @@ class SQLiteRepository(AbstractRepository[T]):
             db_tables = [t[0].lower() for t in res.fetchall()]
             if self.table_name not in db_tables:
                 col_names = ', '.join(self.fields.keys())
-                q = f'CREATE TABLE {self.table_name} (' \
+                query = f'CREATE TABLE {self.table_name} (' \
                     f'"pk" INTEGER PRIMARY KEY AUTOINCREMENT, {col_names})'
-                cur.execute(q)
+                cur.execute(query)
         con.close()
 
     def add(self, obj: T) -> int:
@@ -37,13 +37,13 @@ class SQLiteRepository(AbstractRepository[T]):
         if getattr(obj, 'pk', None) != 0:
             raise ValueError(f'trying to add object {obj} with filled `pk` attribute')
         names = ', '.join(self.fields.keys())
-        p = ', '.join("?" * len(self.fields))
+        param = ', '.join("?" * len(self.fields))
         values = [getattr(obj, x) for x in self.fields]
         with sqlite3.connect(self.db_file) as con:
             cur = con.cursor()
             cur.execute('PRAGMA foreign_keys = ON')
             cur.execute(
-                f'INSERT INTO {self.table_name} ({names}) VALUES ({p})', values
+                f'INSERT INTO {self.table_name} ({names}) VALUES ({param})', values
             )
             obj.pk = cur.lastrowid
         con.close()
@@ -59,13 +59,13 @@ class SQLiteRepository(AbstractRepository[T]):
             res = cur.fetchall()
         con.close()
         if not res:
-            return None
+            obj = None
         else:
             res = res[0]
             kwargs = dict(zip(self.fields, res[1:]))
             obj = self.obj_cls(**kwargs)
             obj.pk = pk
-            return obj
+        return obj
 
     def get_all(self, where: dict[str, Any] | None = None) -> list[T]:
         """
@@ -110,8 +110,10 @@ class SQLiteRepository(AbstractRepository[T]):
             raise ValueError('attempt to delete object with unknown primary key')
         with sqlite3.connect(self.db_file) as con:
             cur = con.cursor()
-            if not cur.execute(f'SELECT * FROM {self.table_name} WHERE ROWID=={pk}').fetchall():
-                raise KeyError
-            else:
+            if cur.execute(
+                    f'SELECT * FROM {self.table_name} WHERE ROWID=={pk}'
+            ).fetchall():
                 cur.execute(f'DELETE FROM {self.table_name} WHERE ROWID=={pk}')
+            else:
+                raise KeyError
         con.close()

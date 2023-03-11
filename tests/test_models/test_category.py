@@ -112,11 +112,3 @@ def test_create_from_tree_error(repo):
     tree = [('1', 'parent'), ('parent', None)]
     with pytest.raises(KeyError):
         Category.create_from_tree(tree, repo)
-
-
-def test_convert_to_list():
-    name = 'name'
-    parent = 1
-    pk = 2
-    c = Category(name=name, parent=parent, pk=pk)
-    assert c.convert_to_list() == [pk, name, parent]

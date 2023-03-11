@@ -19,9 +19,6 @@ class Category:
     parent: int | None = None
     pk: int = 0
 
-    def convert_to_list(self) -> list:
-        return [self.pk, self.name, self.parent]
-
     def get_parent(self,
                    repo: AbstractRepository['Category']) -> 'Category | None':
         """

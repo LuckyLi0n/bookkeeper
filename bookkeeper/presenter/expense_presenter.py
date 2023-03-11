@@ -1,10 +1,11 @@
+""" Модуль реализующий внутреннюю логику и связывающий компоненты View и Model"""
+
 from bookkeeper.models.expense import Expense
 
 
 class ExpensePresenter:
-
-    def __init__(self, model, view, cat_repo, exp_repo):
-        self.model = model
+    """Связь компонентов View и Model"""
+    def __init__(self, view, cat_repo, exp_repo) -> None:
         self.view = view
         self.exp_repo = exp_repo
         self.cat_repo = cat_repo
@@ -16,10 +17,10 @@ class ExpensePresenter:
         """Обновляет отображаемую таблицу расходов в соответствии с базой данных"""
         self.exp_data = self.exp_repo.get_all()
         if self.exp_data:
-            for e in self.exp_data:
-                for c in self.cat_data:
-                    if c.pk == e.category:
-                        e.category = c.name
+            for exp in self.exp_data:
+                for cat in self.cat_data:
+                    if cat.pk == exp.category:
+                        exp.category = cat.name
                         break
         self.view.set_expense_table(self.exp_data)
 
@@ -30,7 +31,9 @@ class ExpensePresenter:
         self.view.set_category_dropdown(self.cat_data)
 
     def handle_expense_add_button_clicked(self) -> None:
-        """При нажатии на кнопку "Добавить" добавляет в базу данных соответствующую запись"""
+        """
+        При нажатии на кнопку "Добавить" добавляет в базу данных соответствующую запись
+        """
         cat_pk = self.view.get_selected_cat()
         amount = self.view.get_amount()
         comment = self.view.get_comment()
