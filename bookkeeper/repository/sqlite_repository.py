@@ -61,6 +61,7 @@ class SQLiteRepository(AbstractRepository[T]):
         if not res:
             return None
         else:
+            res = res[0]
             kwargs = dict(zip(self.fields, res[1:]))
             obj = self.obj_cls(**kwargs)
             obj.pk = pk
@@ -79,7 +80,7 @@ class SQLiteRepository(AbstractRepository[T]):
             else:
                 fields = " AND ".join([f"{f} LIKE ?" for f in where.keys()])
                 res_s = cur.execute(
-                    f'SELECT ROWID, * FROM {self.table_name} ' + f'WHERE {fields}',
+                    f'SELECT * FROM {self.table_name} ' + f'WHERE {fields}',
                     list(where.values())).fetchall()
         obj_s = []
         for res in res_s:

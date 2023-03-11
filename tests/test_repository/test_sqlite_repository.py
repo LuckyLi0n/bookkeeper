@@ -56,6 +56,11 @@ def test_cannot_delete_unexistent(repo, custom_class):
     repo.delete(pk1)
 
 
+def test_cannot_delete_without_pk(repo, custom_class):
+    with pytest.raises(ValueError):
+        repo.delete(0)
+
+
 def test_cannot_update_without_pk(repo, custom_class):
     obj = custom_class()
     with pytest.raises(ValueError):
@@ -72,14 +77,10 @@ def test_get_all(repo, custom_class):
 
 
 def test_get_all_with_condition(repo, custom_class):
-    """
-        Как-то очень хитро get и get_all зависит от структуры класса.
-        Для этого тестового класса не работает то, что работает для
-        реально используемых нами классов. Реального теста на get_all не будет(((
-        """
     objects = []
-    for i in [6, 7]:
-        obj = custom_class(name='name')
-        pk = repo.add(obj)
-        objects.append(custom_class(name=pk, pk=pk))   # для этого класса get_all вместо name выдает pk
-    assert repo.get_all({'name': 'name'}) == objects   # причина неизвестна
+    for i in range(5):
+        o = custom_class()
+        o.name = str(i)
+        repo.add(o)
+        objects.append(o)
+    assert repo.get_all({'name': '0'}) == [objects[0]]
