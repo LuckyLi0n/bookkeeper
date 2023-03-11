@@ -18,5 +18,5 @@ class Budget:
     amount: int
     category: int
     time: int
-    budget_day: int = 0
+    budget: int = 0
     pk: int = 0
