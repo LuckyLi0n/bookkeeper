@@ -8,29 +8,29 @@ class ExpensePresenter:
         self.view = view
         self.exp_repo = exp_repo
         self.cat_repo = cat_repo
-        self.exp_data = [exp.convert_to_list() for exp in self.exp_repo.get_all()]
-        self.cat_data = [cat.convert_to_list() for cat in self.cat_repo.get_all()]
+        self.exp_data = self.exp_repo.get_all()
+        self.cat_data = self.cat_repo.get_all()
         self.view.on_expense_add_button_clicked(self.handle_expense_add_button_clicked)
 
     def update_expense_data(self) -> None:
-        self.exp_data = [exp.convert_to_list() for exp in self.exp_repo.get_all()]
-        data = []
-        for tup in self.exp_data:
-            row = list(tup)
-            for cat_tup in self.cat_data:
-                if cat_tup[0] == row[2]:
-                    row[2] = cat_tup[1]
-                    break
-            data.append(row)
-        self.exp_data = data
+        """Обновляет отображаемую таблицу расходов в соответствии с базой данных"""
+        self.exp_data = self.exp_repo.get_all()
+        if self.exp_data:
+            for e in self.exp_data:
+                for c in self.cat_data:
+                    if c.pk == e.category:
+                        e.category = c.name
+                        break
         self.view.set_expense_table(self.exp_data)
 
     def show(self) -> None:
+        """Вызывает отображение главного окна"""
         self.view.show()
         self.update_expense_data()
         self.view.set_category_dropdown(self.cat_data)
 
     def handle_expense_add_button_clicked(self) -> None:
+        """При нажатии на кнопку "Добавить" добавляет в базу данных соответствующую запись"""
         cat_pk = self.view.get_selected_cat()
         amount = self.view.get_amount()
         comment = self.view.get_comment()

@@ -5,11 +5,13 @@ from PySide6.QtWidgets import QVBoxLayout, QLabel, QWidget,\
 from bookkeeper.view.Table_model import TableModel
 
 
-class ExpenseWidget(QtWidgets.QMainWindow):
+class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
 
         self.item_model = None
+
+        self.setWindowTitle("Программа для ведения бюджета")
 
         self.layout = QVBoxLayout()
 
@@ -32,9 +34,6 @@ class ExpenseWidget(QtWidgets.QMainWindow):
         self.comment_line_edit = QLineEdit()
         self.bottom_controls.addWidget(self.comment_line_edit, 2, 1)
 
-        self.category_edit_button = QPushButton('Редактировать')
-        self.bottom_controls.addWidget(self.category_edit_button, 1, 2)
-
         self.expense_add_button = QPushButton('Добавить')
         self.bottom_controls.addWidget(self.expense_add_button, 3, 1)
 
@@ -52,10 +51,11 @@ class ExpenseWidget(QtWidgets.QMainWindow):
         if data:
             self.item_model = TableModel(data)
             self.expenses_grid.setModel(self.item_model)
+            self.expenses_grid.setColumnHidden(4, True)
 
     def set_category_dropdown(self, data):
-        for tup in data:
-            self.category_dropdown.addItem(tup[1], tup[0])
+        for obj in data:
+            self.category_dropdown.addItem(obj.name, obj.pk)
 
     def on_expense_add_button_clicked(self, slot):
         self.expense_add_button.clicked.connect(slot)
@@ -68,3 +68,4 @@ class ExpenseWidget(QtWidgets.QMainWindow):
 
     def get_selected_cat(self) -> int:
         return self.category_dropdown.itemData(self.category_dropdown.currentIndex())
+
