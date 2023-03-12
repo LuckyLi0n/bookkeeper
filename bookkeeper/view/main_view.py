@@ -88,7 +88,6 @@ class MainWindow(QtWidgets.QMainWindow):
             self.expenses_grid.setColumnWidth(3, 240)
 
     def set_budget_table(self, data) -> None:
-        pass
         """Создает таблицу расходов"""
         if data:
             self.item_model = TableModel(data)
@@ -135,8 +134,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def __get_selected_row_indices(self) -> list[int]:
         """Возвращает индексы выбранных мышкой строк"""
-        return list(set([qmi.row() for qmi in
-                         self.expenses_grid.selectionModel().selection().indexes()]))
+        list_of_index = \
+            list(set([qmi.row() for qmi
+                      in self.expenses_grid.selectionModel().selection().indexes()]))
+        return list_of_index
 
     def get_selected_expenses(self, data) -> list[int] | None:
         """Возвращает список pk объектов, находящихся в строках выделенных мышкой"""

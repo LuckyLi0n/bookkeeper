@@ -3,8 +3,8 @@
 # pylint: disable = c-extension-no-member, invalid-name, unused-argument
 # mypy: disable-error-code = attr-defined
 # Ошибки связанные с Qt и особенностями устройства QAbstractTableModel
-from PySide6 import QtCore
 from typing import Any
+from PySide6 import QtCore
 
 
 class TableModel(QtCore.QAbstractTableModel):

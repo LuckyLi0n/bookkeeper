@@ -40,13 +40,13 @@ class ExpensePresenter:
         self.exp_data = self.exp_repo.get_all()
         day, week, month = 0, 0, 0
         today = datetime.now()
-        for ex in self.exp_data:
-            if ex.expense_date >= f'{(today - timedelta(days=1)):%Y-%m-%d}':
-                day += ex.amount
-            if ex.expense_date >= f'{(today - timedelta(days=7)):%Y-%m-%d}':
-                week += ex.amount
-            if ex.expense_date >= f'{(today - timedelta(days=30)):%Y-%m-%d}':
-                month += ex.amount
+        for expense in self.exp_data:
+            if expense.expense_date >= f'{(today - timedelta(days=1)):%Y-%m-%d}':
+                day += expense.amount
+            if expense.expense_date >= f'{(today - timedelta(days=7)):%Y-%m-%d}':
+                week += expense.amount
+            if expense.expense_date >= f'{(today - timedelta(days=30)):%Y-%m-%d}':
+                month += expense.amount
         self.budget_repo.update(Budget(amount=day, time="День", budget=1000, pk=1))
         self.budget_repo.update(Budget(amount=week, time="Неделя", budget=7000, pk=2))
         self.budget_repo.update(Budget(amount=month, time="Месяц", budget=30000, pk=3))
