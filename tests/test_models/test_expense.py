@@ -12,7 +12,7 @@ def repo():
 
 
 def test_create_with_full_args_list():
-    e = Expense(amount=100, category=1, expense_date=datetime.now(),
+    e = Expense(amount=100, category=1, expense_date=f'{datetime.now() : %Y-%m-%d}',
                 comment='test', pk=1)
     assert e.amount == 100
     assert e.category == 1

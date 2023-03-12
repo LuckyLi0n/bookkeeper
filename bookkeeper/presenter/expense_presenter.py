@@ -1,8 +1,9 @@
 """ Модуль реализующий внутреннюю логику и связывающий компоненты View и Model"""
 
-#from datetime import datetime, timedelta
+from datetime import datetime, timedelta
 
 from bookkeeper.models.expense import Expense
+from bookkeeper.models.budget import Budget
 
 
 class ExpensePresenter:
@@ -30,8 +31,21 @@ class ExpensePresenter:
 
     def update_budget_data(self) -> None:
         """Обновляет отображаемую таблицу бюджета в соответствии с базой данных"""
-        pass
-        self.view.set_budget_table(self.budget_data)
+        self.exp_data = self.exp_repo.get_all()
+        day, week, month = 0, 0, 0
+        today = datetime.now()
+        print(f'{(today - timedelta(days=1)):%Y-%m-%d}')
+        for ex in self.exp_data:
+            if ex.expense_date >= f'{(today - timedelta(days=1)):%Y-%m-%d}':
+                day += ex.amount
+            if ex.expense_date >= f'{(today - timedelta(days=7)):%Y-%m-%d}':
+                week += ex.amount
+            if ex.expense_date >= f'{(today - timedelta(days=30)):%Y-%m-%d}':
+                month += ex.amount
+        self.budget_repo.update(Budget(amount=day, time="День", budget=1000, pk=1))
+        self.budget_repo.update(Budget(amount=week, time="Неделя", budget=7000, pk=2))
+        self.budget_repo.update(Budget(amount=month, time="Месяц", budget=30000, pk=3))
+        self.view.set_budget_table(self.budget_repo.get_all())
 
     def show(self) -> None:
         """Вызывает отображение главного окна"""
@@ -49,6 +63,7 @@ class ExpensePresenter:
         amount = self.view.get_amount()
         comment = self.view.get_comment()
         date = self.view.get_selected_date()
+        print(date)
         exp = Expense(int(amount), cat_pk, expense_date=date, comment=comment)
         self.exp_repo.add(exp)
         self.update_expense_data()
