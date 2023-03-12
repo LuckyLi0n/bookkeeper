@@ -3,7 +3,8 @@
 # pylint: disable= no-name-in-module, c-extension-no-member
 # mypy: disable-error-code = attr-defined
 # Ошибки связанные с Qt
-from PySide6 import QtWidgets
+from PySide6 import QtWidgets, QtCore
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QVBoxLayout, QLabel, QWidget,\
     QGridLayout, QComboBox, QLineEdit, QPushButton
 
@@ -27,22 +28,31 @@ class MainWindow(QtWidgets.QMainWindow):
         self.expenses_grid = QtWidgets.QTableView()
         self.layout.addWidget(self.expenses_grid)
 
+        self.layout.addWidget(QLabel('Бюджет'))
+
+        self.budget_grid = QtWidgets.QTableView()
+        self.layout.addWidget(self.budget_grid)
+
         self.bottom_controls = QGridLayout()
 
         self.bottom_controls.addWidget(QLabel('Сумма'), 0, 0)
         self.amount_line_edit = QLineEdit()
         self.bottom_controls.addWidget(self.amount_line_edit, 0, 1)
 
-        self.bottom_controls.addWidget(QLabel('Категория'), 1, 0)
-        self.category_dropdown = QComboBox()
-        self.bottom_controls.addWidget(self.category_dropdown, 1, 1)
+        self.bottom_controls.addWidget(QLabel('Дата покупки'), 1, 0)
+        self.date_input = DateWidget()
+        self.bottom_controls.addWidget(self.date_input, 1, 1)
 
-        self.bottom_controls.addWidget(QLabel('Комментарий'), 2, 0)
+        self.bottom_controls.addWidget(QLabel('Категория'), 2, 0)
+        self.category_dropdown = QComboBox()
+        self.bottom_controls.addWidget(self.category_dropdown, 2, 1)
+
+        self.bottom_controls.addWidget(QLabel('Комментарий'), 3, 0)
         self.comment_line_edit = QLineEdit()
-        self.bottom_controls.addWidget(self.comment_line_edit, 2, 1)
+        self.bottom_controls.addWidget(self.comment_line_edit, 3, 1)
 
         self.expense_add_button = QPushButton('Добавить')
-        self.bottom_controls.addWidget(self.expense_add_button, 3, 1)
+        self.bottom_controls.addWidget(self.expense_add_button, 4, 1)
 
         self.bottom_widget = QWidget()
         self.bottom_widget.setLayout(self.bottom_controls)
@@ -60,6 +70,14 @@ class MainWindow(QtWidgets.QMainWindow):
             self.item_model = TableModel(data)
             self.expenses_grid.setModel(self.item_model)
             self.expenses_grid.setColumnHidden(4, True)
+
+    def set_budget_table(self, data) -> None:
+        pass
+        """Создает таблицу расходов"""
+        if data:
+            self.item_model = TableModel(data)
+            self.budget_grid.setModel(self.item_model)
+            self.budget_grid.setColumnHidden(3, True)
 
     def set_category_dropdown(self, data) -> None:
         """Отвечает за выпадающий список категорий"""
@@ -81,3 +99,21 @@ class MainWindow(QtWidgets.QMainWindow):
     def get_selected_cat(self) -> int:
         """Возвращает выбранную категорию"""
         return self.category_dropdown.itemData(self.category_dropdown.currentIndex())
+
+    def get_selected_date(self) -> int:
+        """Возвращает выбранную дату"""
+        return self.date_input.dateTime().toPython()
+
+
+class DateWidget(QtWidgets.QDateEdit):
+    """
+    Виджет выбора даты в виде календаря
+    """
+    def __init__(self, date: QtCore.QDate = QtCore.QDate.currentDate()) -> None:
+        super().__init__(date)
+        self.setCalendarPopup(True)
+        self.setDisplayFormat('dd.MM.yyyy')
+        calendar = self.calendarWidget()
+        calendar.setFirstDayOfWeek(Qt.DayOfWeek.Monday)
+        calendar.setGridVisible(True)
+
