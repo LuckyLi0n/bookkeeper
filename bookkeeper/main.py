@@ -14,7 +14,7 @@ from bookkeeper.repository.sqlite_repository import SQLiteRepository
 from bookkeeper.utils import read_tree
 
 
-DB_NAME = 'test4.db'
+DB_NAME = 'test9.db'
 
 if __name__ == '__main__':
 
@@ -56,6 +56,11 @@ if __name__ == '__main__':
                 '''.splitlines()
         Category.create_from_tree(read_tree(cats), category_repo)
 
-    window = ExpensePresenter(view, category_repo, expense_repo)
+    if not budget_repo.get_all():
+        budget_repo.add(Budget(amount=0, time="День", budget=1000))
+        budget_repo.add(Budget(amount=0, time="Неделя", budget=7000))
+        budget_repo.add(Budget(amount=0, time="Месяц", budget=30000))
+
+    window = ExpensePresenter(view, category_repo, expense_repo, budget_repo)
     window.show()
     app.exec()

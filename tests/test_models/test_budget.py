@@ -10,21 +10,19 @@ def repo():
 
 
 def test_create_with_full_args_list():
-    b = Budget(amount=100, category=1, time=7, budget=1000, pk=1)
+    b = Budget(amount=100, time='Day', budget=1000, pk=1)
     assert b.amount == 100
-    assert b.category == 1
-    assert b.time == 7
+    assert b.time == 'Day'
     assert b.budget == 1000
 
 
 def test_create_brief():
-    b = Budget(100, 1, 7)
+    b = Budget("Week", 100)
     assert b.amount == 100
-    assert b.category == 1
-    assert b.time == 7
+    assert b.time == "Week"
 
 
 def test_can_add_to_repo(repo):
-    b = Budget(100, 1, 7)
+    b = Budget("Month", 3000)
     pk = repo.add(b)
     assert b.pk == pk

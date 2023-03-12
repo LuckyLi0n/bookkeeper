@@ -8,15 +8,13 @@ from dataclasses import dataclass
 @dataclass(slots=True)
 class Budget:
     """
-    Бюджет на определенный промежуток времени для категории товаров.
+    Бюджет за определенный промежуток времени
     amount - сумма
-    category - id категории расходов
     time - промежуток времени в днях
-    budget_day - бюджет на день
+    budget - бюджет
     pk - id записи в базе данных
     """
+    time: str
     amount: int
-    category: int
-    time: int
     budget: int = 0
     pk: int = 0
