@@ -55,7 +55,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.expense_change_button = QPushButton('Изменить')
         self.bottom_controls.addWidget(self.expense_change_button, 4, 0)
         self.expense_change_button.setToolTip(
-            'Веди все параметры, потом выдели строку, которую нужно заменить и нажми эту кнопку\n'
+            'Веди все параметры, потом выдели строку, '
+            'которую нужно заменить и нажми эту кнопку\n'
             'Чтобы выделить строку нажми на ее номер')
 
         self.expense_add_button = QPushButton('Добавить')
@@ -134,7 +135,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def __get_selected_row_indices(self) -> list[int]:
         """Возвращает индексы выбранных мышкой строк"""
-        return list(set([qmi.row() for qmi in self.expenses_grid.selectionModel().selection().indexes()]))
+        return list(set([qmi.row() for qmi in
+                         self.expenses_grid.selectionModel().selection().indexes()]))
 
     def get_selected_expenses(self, data) -> list[int] | None:
         """Возвращает список pk объектов, находящихся в строках выделенных мышкой"""

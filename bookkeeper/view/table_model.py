@@ -6,6 +6,7 @@
 from PySide6 import QtCore
 from typing import Any
 
+
 class TableModel(QtCore.QAbstractTableModel):
     """Таблица для показа пользователю сгенерированная из таблицы SQL"""
     def __init__(self, data) -> None:

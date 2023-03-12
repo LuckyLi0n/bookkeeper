@@ -17,8 +17,12 @@ class ExpensePresenter:
         self.cat_data = self.cat_repo.get_all()
         self.budget_data = self.budget_repo.get_all()
         self.view.on_expense_add_button_clicked(self.handle_expense_add_button_clicked)
-        self.view.on_expense_delete_button_clicked(self.handle_expense_delete_button_clicked)
-        self.view.on_expense_change_button_clicked(self.handle_expense_change_button_clicked)
+        self.view.on_expense_delete_button_clicked(
+            self.handle_expense_delete_button_clicked
+        )
+        self.view.on_expense_change_button_clicked(
+            self.handle_expense_change_button_clicked
+        )
 
     def update_expense_data(self) -> None:
         """Обновляет отображаемую таблицу расходов в соответствии с базой данных"""
@@ -94,7 +98,8 @@ class ExpensePresenter:
         date = f'{(self.view.get_selected_date()):%Y-%m-%d}'
         select = self.view.get_selected_expenses(self.exp_repo.get_all())
         if select:
-            exp = Expense(int(amount), cat_pk, expense_date=date, comment=comment, pk=select[0])
+            exp = Expense(int(amount), cat_pk, expense_date=date,
+                          comment=comment, pk=select[0])
             self.exp_repo.update(exp)
             self.update_expense_data()
             self.update_budget_data()
