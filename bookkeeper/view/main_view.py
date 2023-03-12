@@ -18,6 +18,7 @@ class MainWindow(QtWidgets.QMainWindow):
         super().__init__()
 
         self.item_model = None
+        self.width = 600
 
         self.setWindowTitle("Программа для ведения бюджета")
 
@@ -51,8 +52,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.comment_line_edit = QLineEdit()
         self.bottom_controls.addWidget(self.comment_line_edit, 3, 1)
 
+        self.expense_change_button = QPushButton('Редактировать')
+        self.bottom_controls.addWidget(self.expense_change_button, 4, 0)
+
         self.expense_add_button = QPushButton('Добавить')
         self.bottom_controls.addWidget(self.expense_add_button, 4, 1)
+
+        self.expense_delete_button = QPushButton('Удалить')
+        self.bottom_controls.addWidget(self.expense_delete_button, 4, 2)
 
         self.bottom_widget = QWidget()
         self.bottom_widget.setLayout(self.bottom_controls)
@@ -70,6 +77,8 @@ class MainWindow(QtWidgets.QMainWindow):
             self.item_model = TableModel(data)
             self.expenses_grid.setModel(self.item_model)
             self.expenses_grid.setColumnHidden(4, True)
+            self.expenses_grid.setColumnWidth(1, 120)
+            self.expenses_grid.setColumnWidth(3, 240)
 
     def set_budget_table(self, data) -> None:
         pass
@@ -78,6 +87,11 @@ class MainWindow(QtWidgets.QMainWindow):
             self.item_model = TableModel(data)
             self.budget_grid.setModel(self.item_model)
             self.budget_grid.setColumnHidden(3, True)
+            for num in range(3):
+                self.budget_grid.setColumnWidth(num, (self.width-40)//3)
+                self.budget_grid.setRowHeight(1, 30)
+            self.budget_grid.setMaximumHeight(120)
+            self.setFixedSize(self.width, 600)
 
     def set_category_dropdown(self, data) -> None:
         """Отвечает за выпадающий список категорий"""
@@ -87,6 +101,10 @@ class MainWindow(QtWidgets.QMainWindow):
     def on_expense_add_button_clicked(self, slot) -> None:
         """Отвечает за вызов определенной функции при нажатии кнопки "Добавить" """
         self.expense_add_button.clicked.connect(slot)
+
+    def on_expense_delete_button_clicked(self, slot):
+        """Отвечает за вызов определенной функции при нажатии кнопки "Удалить" """
+        self.expense_delete_button.clicked.connect(slot)
 
     def get_amount(self) -> float:
         """Возвращает введенную пользователем сумму"""
@@ -104,6 +122,18 @@ class MainWindow(QtWidgets.QMainWindow):
         """Возвращает выбранную дату"""
         return self.date_input.dateTime().toPython()
 
+    def __get_selected_row_indices(self) -> list[int]:
+        """Возвращает индексы выбранных мышкой строк"""
+        return list(set([qmi.row() for qmi in self.expenses_grid.selectionModel().selection().indexes()]))
+
+    def get_selected_expenses(self, data) -> list[int] | None:
+        """Возвращает список pk объектов, находящихся в строках выделенных мышкой"""
+        self.item_model = TableModel(data)
+        idx = self.__get_selected_row_indices()
+        if not idx:
+            return None
+        return [self.item_model._data[i].pk for i in idx]
+
 
 class DateWidget(QtWidgets.QDateEdit):
     """
@@ -116,4 +146,3 @@ class DateWidget(QtWidgets.QDateEdit):
         calendar = self.calendarWidget()
         calendar.setFirstDayOfWeek(Qt.DayOfWeek.Monday)
         calendar.setGridVisible(True)
-

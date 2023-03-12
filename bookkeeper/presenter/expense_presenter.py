@@ -17,6 +17,7 @@ class ExpensePresenter:
         self.cat_data = self.cat_repo.get_all()
         self.budget_data = self.budget_repo.get_all()
         self.view.on_expense_add_button_clicked(self.handle_expense_add_button_clicked)
+        self.view.on_expense_delete_button_clicked(self.handle_expense_delete_button_clicked)
 
     def update_expense_data(self) -> None:
         """Обновляет отображаемую таблицу расходов в соответствии с базой данных"""
@@ -27,14 +28,13 @@ class ExpensePresenter:
                     if cat.pk == exp.category:
                         exp.category = cat.name
                         break
-        self.view.set_expense_table(self.exp_data)
+            self.view.set_expense_table(self.exp_data)
 
     def update_budget_data(self) -> None:
         """Обновляет отображаемую таблицу бюджета в соответствии с базой данных"""
         self.exp_data = self.exp_repo.get_all()
         day, week, month = 0, 0, 0
         today = datetime.now()
-        print(f'{(today - timedelta(days=1)):%Y-%m-%d}')
         for ex in self.exp_data:
             if ex.expense_date >= f'{(today - timedelta(days=1)):%Y-%m-%d}':
                 day += ex.amount
@@ -62,9 +62,24 @@ class ExpensePresenter:
         cat_pk = self.view.get_selected_cat()
         amount = self.view.get_amount()
         comment = self.view.get_comment()
-        date = self.view.get_selected_date()
-        print(date)
+        date = f'{(self.view.get_selected_date()):%Y-%m-%d}'
         exp = Expense(int(amount), cat_pk, expense_date=date, comment=comment)
         self.exp_repo.add(exp)
         self.update_expense_data()
         self.update_budget_data()
+
+    def handle_expense_delete_button_clicked(self) -> None:
+        """
+        При нажатии на кнопку "Удалить" удаляет из базы данных
+        соответствующие записи и вызывает обновление таблиц.
+        Удаление последней записи из таблицы отображается
+        только при перезапуске программы
+        """
+        selected = self.view.get_selected_expenses(self.exp_repo.get_all())
+        print(selected)
+        if selected:
+            for pk in selected:
+                self.exp_repo.delete(pk)
+            self.update_expense_data()
+            self.update_budget_data()
+

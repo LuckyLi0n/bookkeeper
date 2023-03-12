@@ -11,7 +11,7 @@ from bookkeeper.repository.abstract_repository import AbstractRepository, T
 
 class SQLiteRepository(AbstractRepository[T]):
     """
-    Репозиторий, работающий c базой данных SQLite и хранящий в ней данные.
+    Репозиторий, работающий c SQLite и хранящий данные в базе данных.
     """
 
     def __init__(self, db_file: str, cls: type) -> None:
@@ -110,10 +110,8 @@ class SQLiteRepository(AbstractRepository[T]):
             raise ValueError('attempt to delete object with unknown primary key')
         with sqlite3.connect(self.db_file) as con:
             cur = con.cursor()
-            if cur.execute(
-                    f'SELECT * FROM {self.table_name} WHERE ROWID=={pk}'
-            ).fetchall():
-                cur.execute(f'DELETE FROM {self.table_name} WHERE ROWID=={pk}')
-            else:
-                raise KeyError
+            cur.execute(f'DELETE FROM {self.table_name} WHERE pk = {pk}')
+            deleted_count = cur.rowcount
         con.close()
+        if deleted_count == 0:
+            raise KeyError
