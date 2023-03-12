@@ -16,12 +16,18 @@ class ExpensePresenter:
         self.exp_data = self.exp_repo.get_all()
         self.cat_data = self.cat_repo.get_all()
         self.budget_data = self.budget_repo.get_all()
+        self.b_day = self.budget_data[0].budget
+        self.b_week = self.budget_data[1].budget
+        self.b_month = self.budget_data[2].budget
         self.view.on_expense_add_button_clicked(self.handle_expense_add_button_clicked)
         self.view.on_expense_delete_button_clicked(
             self.handle_expense_delete_button_clicked
         )
         self.view.on_expense_change_button_clicked(
             self.handle_expense_change_button_clicked
+        )
+        self.view.on_budget_change_button_clicked(
+            self.handle_budget_change_button_clicked
         )
 
     def update_expense_data(self) -> None:
@@ -47,9 +53,12 @@ class ExpensePresenter:
                 week += expense.amount
             if expense.expense_date >= f'{(today - timedelta(days=30)):%Y-%m-%d}':
                 month += expense.amount
-        self.budget_repo.update(Budget(amount=day, time="День", budget=1000, pk=1))
-        self.budget_repo.update(Budget(amount=week, time="Неделя", budget=7000, pk=2))
-        self.budget_repo.update(Budget(amount=month, time="Месяц", budget=30000, pk=3))
+        self.budget_repo.update(Budget(amount=day,
+                                       time="День", budget=self.b_day, pk=1))
+        self.budget_repo.update(Budget(amount=week,
+                                       time="Неделя", budget=self.b_week, pk=2))
+        self.budget_repo.update(Budget(amount=month,
+                                       time="Месяц", budget=self.b_month, pk=3))
         self.view.set_budget_table(self.budget_repo.get_all())
 
     def show(self) -> None:
@@ -93,13 +102,30 @@ class ExpensePresenter:
         соответствующую запись и вызывает обновление таблиц.
         """
         cat_pk = self.view.get_selected_cat()
-        amount = self.view.get_amount()
+        amount = int(self.view.get_amount())
         comment = self.view.get_comment()
         date = f'{(self.view.get_selected_date()):%Y-%m-%d}'
-        select = self.view.get_selected_expenses(self.exp_repo.get_all())
+        select = self.view.get_selected(self.exp_repo.get_all())
         if select:
             exp = Expense(int(amount), cat_pk, expense_date=date,
                           comment=comment, pk=select[0])
             self.exp_repo.update(exp)
             self.update_expense_data()
             self.update_budget_data()
+
+    def handle_budget_change_button_clicked(self) -> None:
+        """
+        При нажатии на кнопку "Изменить Бюджет" изменяет бюджет
+        на определенный промежуток времени.
+        """
+        budget_sum = int(self.view.get_amount())
+        select = self.view.get_selected(self.budget_repo.get_all())
+        if select:
+            select = select[0]
+            if select == 1:
+                self.b_day = budget_sum
+            elif select == 2:
+                self.b_week = budget_sum
+            elif select == 3:
+                self.b_month = budget_sum
+        self.update_budget_data()

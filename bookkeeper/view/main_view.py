@@ -68,6 +68,13 @@ class MainWindow(QtWidgets.QMainWindow):
             'Выдели строки, которые хочешь удалить и нажми эту кнопку\n'
             'Чтобы выделить строки нажимай на их номера')
 
+        self.budget_change_button = QPushButton('Изменить \n Бюджет')
+        self.bottom_controls.addWidget(self.budget_change_button, 0, 2)
+        self.budget_change_button.setToolTip(
+            'Введи в поле "Сумма" новый бюджет\n'
+            'Выдели строку в которой хочешь заменить бюджет\n'
+            'Чтобы выделить строки нажимай на их номера')
+
         self.bottom_widget = QWidget()
         self.bottom_widget.setLayout(self.bottom_controls)
 
@@ -113,8 +120,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.expense_delete_button.clicked.connect(slot)
 
     def on_expense_change_button_clicked(self, slot):
-        """Отвечает за вызов определенной функции при нажатии кнопки "" """
+        """Отвечает за вызов определенной функции при нажатии кнопки "Изменить" """
         self.expense_change_button.clicked.connect(slot)
+
+    def on_budget_change_button_clicked(self, slot):
+        """Отвечает за вызов определенной функции при нажатии кнопки "Изменить Бюджет" """
+        self.budget_change_button.clicked.connect(slot)
 
     def get_amount(self) -> float:
         """Возвращает введенную пользователем сумму"""
@@ -132,17 +143,31 @@ class MainWindow(QtWidgets.QMainWindow):
         """Возвращает выбранную дату"""
         return self.date_input.dateTime().toPython()
 
-    def __get_selected_row_indices(self) -> list[int]:
-        """Возвращает индексы выбранных мышкой строк"""
+    def __get_selected_row_indices_expense(self) -> list[int]:
+        """Возвращает индексы выбранных мышкой строк
+        из таблицы Последних расходов"""
         list_of_index = \
             list(set([qmi.row() for qmi
                       in self.expenses_grid.selectionModel().selection().indexes()]))
         return list_of_index
 
-    def get_selected_expenses(self, data) -> list[int] | None:
+    def __get_selected_row_indices_budget(self) -> list[int]:
+        """Возвращает индексы выбранных мышкой строк
+         из таблицы бюджета"""
+        list_of_index = \
+            list(set([qmi.row() for qmi
+                      in self.budget_grid.selectionModel().selection().indexes()]))
+        return list_of_index
+
+    def get_selected(self, data) -> list[int] | None:
         """Возвращает список pk объектов, находящихся в строках выделенных мышкой"""
         self.item_model = TableModel(data)
-        idx = self.__get_selected_row_indices()
+        data_type = str(type(data[0]))
+        idx = None
+        if data_type == "<class 'bookkeeper.models.expense.Expense'>":
+            idx = self.__get_selected_row_indices_expense()
+        elif data_type == "<class 'bookkeeper.models.budget.Budget'>":
+            idx = self.__get_selected_row_indices_budget()
         if not idx:
             return None
         return [self.item_model._data[i].pk for i in idx]
