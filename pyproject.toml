@@ -2,7 +2,7 @@
 name = "pybookkeeper"
 version = "0.1.0"
 description = "Python app to manage your personal finances"
-authors = ["Anatoly Chistov <atchistov@gmail.com>"]
+authors = ["Margarita Golius <golius.me@phystech.edu>"]
 license = "MIT"
 readme = "README.md"
 packages = [{include = "bookkeeper"}]
@@ -11,7 +11,6 @@ packages = [{include = "bookkeeper"}]
 python = "<3.12, >=3.8.1"
 pytest-cov = "^4.0.0"
 pyside6 = "^6.4.2"
-
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2.0"

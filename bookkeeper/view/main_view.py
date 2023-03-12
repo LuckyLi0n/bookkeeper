@@ -52,14 +52,20 @@ class MainWindow(QtWidgets.QMainWindow):
         self.comment_line_edit = QLineEdit()
         self.bottom_controls.addWidget(self.comment_line_edit, 3, 1)
 
-        self.expense_change_button = QPushButton('Редактировать')
+        self.expense_change_button = QPushButton('Изменить')
         self.bottom_controls.addWidget(self.expense_change_button, 4, 0)
+        self.expense_change_button.setToolTip(
+            'Веди все параметры, потом выдели строку, которую нужно заменить и нажми эту кнопку\n'
+            'Чтобы выделить строку нажми на ее номер')
 
         self.expense_add_button = QPushButton('Добавить')
         self.bottom_controls.addWidget(self.expense_add_button, 4, 1)
 
         self.expense_delete_button = QPushButton('Удалить')
         self.bottom_controls.addWidget(self.expense_delete_button, 4, 2)
+        self.expense_delete_button.setToolTip(
+            'Выдели строки, которые хочешь удалить и нажми эту кнопку\n'
+            'Чтобы выделить строки нажимай на их номера')
 
         self.bottom_widget = QWidget()
         self.bottom_widget.setLayout(self.bottom_controls)
@@ -105,6 +111,10 @@ class MainWindow(QtWidgets.QMainWindow):
     def on_expense_delete_button_clicked(self, slot):
         """Отвечает за вызов определенной функции при нажатии кнопки "Удалить" """
         self.expense_delete_button.clicked.connect(slot)
+
+    def on_expense_change_button_clicked(self, slot):
+        """Отвечает за вызов определенной функции при нажатии кнопки "" """
+        self.expense_change_button.clicked.connect(slot)
 
     def get_amount(self) -> float:
         """Возвращает введенную пользователем сумму"""

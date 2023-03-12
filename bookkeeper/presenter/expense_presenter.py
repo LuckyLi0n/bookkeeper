@@ -18,6 +18,7 @@ class ExpensePresenter:
         self.budget_data = self.budget_repo.get_all()
         self.view.on_expense_add_button_clicked(self.handle_expense_add_button_clicked)
         self.view.on_expense_delete_button_clicked(self.handle_expense_delete_button_clicked)
+        self.view.on_expense_change_button_clicked(self.handle_expense_change_button_clicked)
 
     def update_expense_data(self) -> None:
         """Обновляет отображаемую таблицу расходов в соответствии с базой данных"""
@@ -76,10 +77,24 @@ class ExpensePresenter:
         только при перезапуске программы
         """
         selected = self.view.get_selected_expenses(self.exp_repo.get_all())
-        print(selected)
         if selected:
             for pk in selected:
                 self.exp_repo.delete(pk)
             self.update_expense_data()
             self.update_budget_data()
 
+    def handle_expense_change_button_clicked(self) -> None:
+        """
+        При нажатии на кнопку "Изменить" заменяет в базе данных
+        соответствующую запись и вызывает обновление таблиц.
+        """
+        cat_pk = self.view.get_selected_cat()
+        amount = self.view.get_amount()
+        comment = self.view.get_comment()
+        date = f'{(self.view.get_selected_date()):%Y-%m-%d}'
+        select = self.view.get_selected_expenses(self.exp_repo.get_all())
+        if select:
+            exp = Expense(int(amount), cat_pk, expense_date=date, comment=comment, pk=select[0])
+            self.exp_repo.update(exp)
+            self.update_expense_data()
+            self.update_budget_data()
