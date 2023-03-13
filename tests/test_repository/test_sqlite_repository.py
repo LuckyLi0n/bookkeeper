@@ -86,5 +86,3 @@ def test_get_all_with_condition(repo, custom_class):
         repo.add(o)
         objects.append(o)
     assert repo.get_all({'name': '0'}) == [objects[0]]
-    if os.path.isfile('test_db.db'):
-        os.remove('test_db.db')
