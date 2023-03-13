@@ -1,6 +1,6 @@
 """Таблица для использования в графическом интерфейсе"""
 
-# pylint: disable = c-extension-no-member, invalid-name, unused-argument, no-name-in-module)
+# pylint: disable=c-extension-no-member, invalid-name, unused-argument, no-name-in-module
 # mypy: disable-error-code = attr-defined
 # Ошибки связанные с Qt и особенностями устройства QAbstractTableModel
 from typing import Any
