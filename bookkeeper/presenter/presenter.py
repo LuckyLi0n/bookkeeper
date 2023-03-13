@@ -104,7 +104,7 @@ class Presenter:
         cat_pk = self.view.get_selected_cat()
         amount = self.view.get_amount()
         comment = self.view.get_comment()
-        date = f'{(self.view.get_selected_date()):%Y-%m-%d}'
+        date = self.view.get_selected_date()
         exp = Expense(int(amount), cat_pk, expense_date=date, comment=comment)
         self.exp_repo.add(exp)
         self.update_expense_data()
@@ -159,11 +159,20 @@ class Presenter:
         self.update_budget_data()
 
     def handle_category_edit_button_clicked(self):
+        """
+        При нажатии на кнопку "Редактировать Категории"
+        открывает соответствующее окно
+        """
         self.update_category_data()
-
         self.cat_view.show()
 
     def handle_category_add_button_clicked(self) -> None:
+        """
+        При нажатии на кнопку "Добавить" в окне категорий
+        добавляет в базу данных соответствующую запись
+        и вызывает обновление выпадающего списка категорий
+        и таблицы категорий
+        """
         new_cat_name = self.cat_view.get_cat_name()
         parent_cat_pk = self.cat_view.get_selected_cat()
         cat = Category(name=new_cat_name, parent=parent_cat_pk)
@@ -171,6 +180,12 @@ class Presenter:
         self.update_category_data()
 
     def handle_category_delete_button_clicked(self) -> None:
+        """
+        При нажатии на кнопку "Удалить" в окне категорий
+        удаляет из базы данных соответствующую запись
+        и вызывает обновление выпадающего списка категорий
+        и таблицы категорий
+        """
         selected = self.cat_view.get_selected(self.cat_repo.get_all())
         if selected:
             for pk in selected:
@@ -178,6 +193,12 @@ class Presenter:
         self.update_category_data()
 
     def handle_category_change_button_clicked(self) -> None:
+        """
+        При нажатии на кнопку "Изменить" в окне категорий
+        заменяет в базе данных соответствующую запись
+        и вызывает обновление выпадающего списка категорий
+        и таблицы категорий
+        """
         new_cat_name = self.cat_view.get_cat_name()
         parent_cat_pk = self.cat_view.get_selected_cat()
         select = self.cat_view.get_selected(self.cat_repo.get_all())

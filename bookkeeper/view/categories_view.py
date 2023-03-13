@@ -1,4 +1,8 @@
 """Окно редактирования категорий"""
+
+# pylint: disable= no-name-in-module, c-extension-no-member
+# mypy: disable-error-code = attr-defined
+# Ошибки связанные с Qt
 from PySide6 import QtWidgets
 from PySide6.QtWidgets import QVBoxLayout, QLabel, QWidget,\
     QGridLayout, QComboBox, QLineEdit, QPushButton
@@ -53,10 +57,10 @@ class CategoryView(QtWidgets.QMainWindow):
             'Выдели строки, которые хочешь удалить и нажми эту кнопку\n'
             'Чтобы выделить строки нажимай на их номера')
 
-        self.bottom_widget = QWidget()
-        self.bottom_widget.setLayout(self.bottom_controls)
+        self.bottom_category_widget = QWidget()
+        self.bottom_category_widget.setLayout(self.bottom_controls)
 
-        self.layout.addWidget(self.bottom_widget)
+        self.layout.addWidget(self.bottom_category_widget)
 
         self.widget = QWidget()
         self.widget.setLayout(self.layout)
@@ -94,7 +98,9 @@ class CategoryView(QtWidgets.QMainWindow):
 
     def get_selected_cat(self) -> int:
         """Возвращает выбранную категорию"""
-        return self.category_dropdown.itemData(self.category_dropdown.currentIndex())
+        return int(
+            self.category_dropdown.itemData(self.category_dropdown.currentIndex())
+        )
 
     def __get_selected_row_indices_category(self) -> list[int]:
         """Возвращает индексы выбранных мышкой строк

@@ -148,11 +148,13 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def get_selected_cat(self) -> int:
         """Возвращает выбранную категорию"""
-        return self.category_dropdown.itemData(self.category_dropdown.currentIndex())
+        return int(
+            self.category_dropdown.itemData(self.category_dropdown.currentIndex())
+        )
 
-    def get_selected_date(self) -> int:
+    def get_selected_date(self) -> str:
         """Возвращает выбранную дату"""
-        return self.date_input.dateTime().toPython()
+        return f'{(self.date_input.dateTime().toPython()):%Y-%m-%d}'
 
     def __get_selected_row_indices_expense(self) -> list[int]:
         """Возвращает индексы выбранных мышкой строк

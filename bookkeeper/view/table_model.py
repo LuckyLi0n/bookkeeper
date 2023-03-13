@@ -1,10 +1,11 @@
 """Таблица для использования в графическом интерфейсе"""
 
-# pylint: disable = c-extension-no-member, invalid-name, unused-argument
+# pylint: disable = c-extension-no-member, invalid-name, unused-argument, no-name-in-module)
 # mypy: disable-error-code = attr-defined
 # Ошибки связанные с Qt и особенностями устройства QAbstractTableModel
 from typing import Any
 from PySide6 import QtCore
+from PySide6.QtCore import Qt
 
 
 class TableModel(QtCore.QAbstractTableModel):
@@ -25,15 +26,15 @@ class TableModel(QtCore.QAbstractTableModel):
         self._data = data
         self.header_names = col_name_to_rus(list(data[0].__dataclass_fields__.keys()))
 
-    def headerData(self, section, orientation, role=QtCore.Qt.DisplayRole) -> Any:
+    def headerData(self, section, orientation, role=Qt.DisplayRole) -> Any:
         """Подпись столбцов"""
-        if orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole:
+        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
             return self.header_names[section]
         return super().headerData(section, orientation, role)
 
     def data(self, index, role) -> Any:
         """Обработка таблицы sql"""
-        if role == QtCore.Qt.DisplayRole:
+        if role == Qt.DisplayRole:
             fields = list(self._data[index.row()].__dataclass_fields__.keys())
             return self._data[index.row()].__getattribute__(fields[index.column()])
         return None
