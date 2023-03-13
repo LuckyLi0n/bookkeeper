@@ -14,7 +14,8 @@ class TableModel(QtCore.QAbstractTableModel):
         def col_name_to_rus(columns: list) -> list:
             names_dict = {'pk': 'ID', 'amount': 'Сумма', 'category': 'Категория',
                           'expense_date': 'Дата покупки', 'comment': 'Комментарий',
-                          'budget': 'Бюджет', 'name': 'Название', 'parent': 'Родительская категория'}
+                          'budget': 'Бюджет', 'name': 'Название',
+                          'parent': 'Родительская категория'}
             names = []
             for i in columns:
                 names.append(names_dict.get(i))

@@ -111,4 +111,3 @@ class CategoryView(QtWidgets.QMainWindow):
         if not idx:
             return None
         return [self.item_model._data[i].pk for i in idx]
-    

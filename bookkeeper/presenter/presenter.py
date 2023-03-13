@@ -185,4 +185,3 @@ class Presenter:
             cat = Category(name=new_cat_name, parent=parent_cat_pk, pk=select[0])
             self.cat_repo.update(cat)
             self.update_category_data()
-            
