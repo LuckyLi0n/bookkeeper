@@ -132,7 +132,7 @@ class Presenter:
         cat_pk = self.view.get_selected_cat()
         amount = self.view.get_amount()
         comment = self.view.get_comment()
-        date = f'{(self.view.get_selected_date()):%Y-%m-%d}'
+        date = self.view.get_selected_date()
         select = self.view.get_selected(self.exp_repo.get_all())
         if select:
             exp = Expense(amount, cat_pk, expense_date=date,
