@@ -45,7 +45,7 @@ class SQLiteRepository(AbstractRepository[T]):
             cur.execute(
                 f'INSERT INTO {self.table_name} ({names}) VALUES ({param})', values
             )
-            obj.pk = cur.lastrowid
+            obj.pk = cur.lastrowid  # type: ignore
         con.close()
         return obj.pk
 

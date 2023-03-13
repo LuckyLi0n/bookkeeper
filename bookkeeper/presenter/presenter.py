@@ -1,6 +1,7 @@
 """ Модуль реализующий внутреннюю логику и связывающий компоненты View и Model"""
 
 from datetime import datetime, timedelta
+from typing import Any
 
 from bookkeeper.models.expense import Expense
 from bookkeeper.models.budget import Budget
@@ -9,7 +10,8 @@ from bookkeeper.models.category import Category
 
 class Presenter:
     """Связь компонентов View и Model"""
-    def __init__(self, view, cat_view, cat_repo, exp_repo, budget_repo) -> None:
+    def __init__(self, view: Any, cat_view: Any, cat_repo: Any,
+                 exp_repo: Any, budget_repo: Any) -> None:
         self.view = view
         self.cat_view = cat_view
         self.exp_repo = exp_repo
@@ -158,7 +160,7 @@ class Presenter:
                 self.b_month = budget_sum
         self.update_budget_data()
 
-    def handle_category_edit_button_clicked(self):
+    def handle_category_edit_button_clicked(self) -> None:
         """
         При нажатии на кнопку "Редактировать Категории"
         открывает соответствующее окно

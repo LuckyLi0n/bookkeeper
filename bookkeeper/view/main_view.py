@@ -1,7 +1,7 @@
 """Главное окно """
 
+from typing import Any
 # pylint: disable= no-name-in-module, c-extension-no-member
-# mypy: disable-error-code = attr-defined
 # Ошибки связанные с Qt
 from PySide6 import QtWidgets, QtCore
 from PySide6.QtCore import Qt
@@ -19,23 +19,21 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.item_model = None
 
-        self.width = 600
-        self.height = 800
-        self.setFixedSize(self.width, self.height)
+        self.setFixedSize(600, 800)
 
         self.setWindowTitle("Программа для ведения бюджета")
 
-        self.layout = QVBoxLayout()
+        self.layout = QVBoxLayout()  # type: ignore
 
-        self.layout.addWidget(QLabel('Последние расходы'))
+        self.layout.addWidget(QLabel('Последние расходы'))  # type: ignore
 
         self.expenses_grid = QtWidgets.QTableView()
-        self.layout.addWidget(self.expenses_grid)
+        self.layout.addWidget(self.expenses_grid)  # type: ignore
 
-        self.layout.addWidget(QLabel('Бюджет'))
+        self.layout.addWidget(QLabel('Бюджет'))  # type: ignore
 
         self.budget_grid = QtWidgets.QTableView()
-        self.layout.addWidget(self.budget_grid)
+        self.layout.addWidget(self.budget_grid)  # type: ignore
 
         self.bottom_controls = QGridLayout()
 
@@ -86,57 +84,59 @@ class MainWindow(QtWidgets.QMainWindow):
         self.bottom_widget = QWidget()
         self.bottom_widget.setLayout(self.bottom_controls)
 
-        self.layout.addWidget(self.bottom_widget)
+        self.layout.addWidget(self.bottom_widget)  # type: ignore
 
         self.widget = QWidget()
-        self.widget.setLayout(self.layout)
+        self.widget.setLayout(self.layout)  # type: ignore
 
         self.setCentralWidget(self.widget)
 
-    def set_expense_table(self, data) -> None:
+    def set_expense_table(self, data: list[Any]) -> None:
         """Создает таблицу расходов"""
         if data:
-            self.item_model = TableModel(data)
-            self.expenses_grid.setModel(self.item_model)
+            self.item_model = TableModel(data)  # type: ignore
+            self.expenses_grid.setModel(self.item_model)  # type: ignore
             self.expenses_grid.setColumnHidden(4, True)
             self.expenses_grid.setColumnWidth(1, 120)
             self.expenses_grid.setColumnWidth(3, 240)
 
-    def set_budget_table(self, data) -> None:
+    def set_budget_table(self, data: list[Any]) -> None:
         """Создает таблицу бюджета"""
         if data:
-            self.item_model = TableModel(data)
-            self.budget_grid.setModel(self.item_model)
+            self.item_model = TableModel(data)  # type: ignore
+            self.budget_grid.setModel(self.item_model)  # type: ignore
             self.budget_grid.setColumnHidden(3, True)
             for num in range(3):
-                self.budget_grid.setColumnWidth(num, (self.width-40)//3)
+                self.budget_grid.setColumnWidth(num, (600-40)//3)
                 self.budget_grid.setRowHeight(1, 30)
             self.budget_grid.setMaximumHeight(120)
 
-    def set_category_dropdown(self, data) -> None:
+    def set_category_dropdown(self, data: list[Any]) -> None:
         """Отвечает за выпадающий список категорий"""
         self.category_dropdown.clear()
         for obj in data:
             self.category_dropdown.addItem(obj.name, obj.pk)
 
-    def on_expense_add_button_clicked(self, slot) -> None:
+    def on_expense_add_button_clicked(self, slot: Any) -> None:
         """Отвечает за вызов определенной функции при нажатии кнопки "Добавить" """
-        self.expense_add_button.clicked.connect(slot)
+        self.expense_add_button.clicked.connect(slot)  # type: ignore
 
-    def on_expense_delete_button_clicked(self, slot):
+    def on_expense_delete_button_clicked(self, slot: Any) -> None:
         """Отвечает за вызов определенной функции при нажатии кнопки "Удалить" """
-        self.expense_delete_button.clicked.connect(slot)
+        self.expense_delete_button.clicked.connect(slot)  # type: ignore
 
-    def on_expense_change_button_clicked(self, slot):
+    def on_expense_change_button_clicked(self, slot: Any) -> None:
         """Отвечает за вызов определенной функции при нажатии кнопки "Изменить" """
-        self.expense_change_button.clicked.connect(slot)
+        self.expense_change_button.clicked.connect(slot)  # type: ignore
 
-    def on_budget_change_button_clicked(self, slot):
+    def on_budget_change_button_clicked(self, slot: Any) -> None:
         """Отвечает за вызов определенной функции при нажатии кнопки "Изменить Бюджет" """
-        self.budget_change_button.clicked.connect(slot)
+        self.budget_change_button.clicked.connect(slot)  # type: ignore
 
-    def on_category_edit_button_clicked(self, slot):
-        self.category_edit_button.clicked.connect(slot)
+    def on_category_edit_button_clicked(self, slot: Any) -> None:
+        """Отвечает за вызов определенной функции при нажатии кнопки
+         "Редактировать категории" """
+        self.category_edit_button.clicked.connect(slot)  # type: ignore
 
     def get_amount(self) -> float:
         """Возвращает введенную пользователем сумму"""
@@ -172,9 +172,9 @@ class MainWindow(QtWidgets.QMainWindow):
                       in self.budget_grid.selectionModel().selection().indexes()]))
         return list_of_index
 
-    def get_selected(self, data) -> list[int] | None:
+    def get_selected(self, data: list[Any]) -> list[int] | None:
         """Возвращает список pk объектов, находящихся в строках выделенных мышкой"""
-        self.item_model = TableModel(data)
+        self.item_model = TableModel(data)      # type: ignore
         data_type = str(type(data[0]))
         idx = None
         if data_type == "<class 'bookkeeper.models.expense.Expense'>":
@@ -183,7 +183,7 @@ class MainWindow(QtWidgets.QMainWindow):
             idx = self.__get_selected_row_indices_budget()
         if not idx:
             return None
-        return [self.item_model._data[i].pk for i in idx]
+        return [self.item_model._data[i].pk for i in idx]       # type: ignore
 
 
 class DateWidget(QtWidgets.QDateEdit):

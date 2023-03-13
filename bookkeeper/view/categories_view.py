@@ -1,7 +1,7 @@
 """Окно редактирования категорий"""
 
+from typing import Any
 # pylint: disable= no-name-in-module, c-extension-no-member
-# mypy: disable-error-code = attr-defined
 # Ошибки связанные с Qt
 from PySide6 import QtWidgets
 from PySide6.QtWidgets import QVBoxLayout, QLabel, QWidget,\
@@ -18,18 +18,16 @@ class CategoryView(QtWidgets.QMainWindow):
 
         self.item_model = None
 
-        self.width = 400
-        self.height = 500
-        self.setFixedSize(self.width, self.height)
+        self.setFixedSize(450, 500)
 
         self.setWindowTitle("Редактирование списка категорий")
 
-        self.layout = QVBoxLayout()
+        self.layout = QVBoxLayout()  # type: ignore
 
-        self.layout.addWidget(QLabel('Список категорий'))
+        self.layout.addWidget(QLabel('Список категорий'))       # type: ignore
 
         self.category_grid = QtWidgets.QTableView()
-        self.layout.addWidget(self.category_grid)
+        self.layout.addWidget(self.category_grid)       # type: ignore
 
         self.bottom_controls = QGridLayout()
 
@@ -60,37 +58,39 @@ class CategoryView(QtWidgets.QMainWindow):
         self.bottom_category_widget = QWidget()
         self.bottom_category_widget.setLayout(self.bottom_controls)
 
-        self.layout.addWidget(self.bottom_category_widget)
+        self.layout.addWidget(self.bottom_category_widget)      # type: ignore
 
         self.widget = QWidget()
-        self.widget.setLayout(self.layout)
+        self.widget.setLayout(self.layout)  # type: ignore
 
         self.setCentralWidget(self.widget)
 
-    def set_category_table(self, data) -> None:
+    def set_category_table(self, data: list[Any]) -> None:
         """Создает таблицу категорий"""
         if data:
-            self.item_model = TableModel(data)
-            self.category_grid.setModel(self.item_model)
+            self.item_model = TableModel(data)  # type: ignore
+            self.category_grid.setModel(self.item_model)    # type: ignore
             self.category_grid.hideColumn(2)
+            self.category_grid.setColumnWidth(0, 200)
+            self.category_grid.setColumnWidth(1, 200)
 
-    def set_category_dropdown(self, data) -> None:
+    def set_category_dropdown(self, data: list[Any]) -> None:
         """Отвечает за выпадающий список категорий"""
         self.category_dropdown.clear()
         for obj in data:
             self.category_dropdown.addItem(obj.name, obj.pk)
 
-    def on_category_add_button_clicked(self, slot) -> None:
+    def on_category_add_button_clicked(self, slot: Any) -> None:
         """Отвечает за вызов определенной функции при нажатии кнопки "Добавить" """
-        self.category_add_button.clicked.connect(slot)
+        self.category_add_button.clicked.connect(slot)      # type: ignore
 
-    def on_category_delete_button_clicked(self, slot):
+    def on_category_delete_button_clicked(self, slot: Any) -> None:
         """Отвечает за вызов определенной функции при нажатии кнопки "Удалить" """
-        self.category_delete_button.clicked.connect(slot)
+        self.category_delete_button.clicked.connect(slot)       # type: ignore
 
-    def on_category_change_button_clicked(self, slot):
+    def on_category_change_button_clicked(self, slot: Any) -> None:
         """Отвечает за вызов определенной функции при нажатии кнопки "Изменить" """
-        self.category_change_button.clicked.connect(slot)
+        self.category_change_button.clicked.connect(slot)       # type: ignore
 
     def get_cat_name(self) -> str:
         """Возвращает введенное пользователем имя подкатегории"""
@@ -110,10 +110,10 @@ class CategoryView(QtWidgets.QMainWindow):
                       in self.category_grid.selectionModel().selection().indexes()]))
         return list_of_index
 
-    def get_selected(self, data) -> list[int] | None:
+    def get_selected(self, data: list[Any]) -> list[int] | None:
         """Возвращает список pk объектов, находящихся в строках выделенных мышкой"""
-        self.item_model = TableModel(data)
+        self.item_model = TableModel(data)  # type: ignore
         idx = self.__get_selected_row_indices_category()
         if not idx:
             return None
-        return [self.item_model._data[i].pk for i in idx]
+        return [self.item_model._data[i].pk for i in idx]       # type: ignore
