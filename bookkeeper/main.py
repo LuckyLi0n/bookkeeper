@@ -6,7 +6,8 @@ import sys
 from PySide6.QtWidgets import QApplication
 
 from bookkeeper.view.main_view import MainWindow
-from bookkeeper.presenter.expense_presenter import ExpensePresenter
+from bookkeeper.view.categories_view import CategoryView
+from bookkeeper.presenter.presenter import Presenter
 from bookkeeper.models.category import Category
 from bookkeeper.models.expense import Expense
 from bookkeeper.models.budget import Budget
@@ -21,6 +22,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
 
     view = MainWindow()
+    cat_view = CategoryView()
 
     category_repo = SQLiteRepository[Category](DB_NAME, Category)
     expense_repo = SQLiteRepository[Expense](DB_NAME, Expense)
@@ -29,26 +31,8 @@ if __name__ == '__main__':
     if not category_repo.get_all():
         cats = '''
                 продукты
-                    мясо
-                        сырое мясо
-                        мясные продукты
-                    сладости
-                    хлеб
-                    напитки
-                        кофе
-                        чай
-                        сок
-                        вода
                 развлечения
-                    кино
-                    театр
-                    концерт
-                    ресторан
                 транспорт
-                    бензин
-                    метро
-                    такси
-                    билеты
                 книги
                 одежда
                 товары для дома
@@ -61,6 +45,6 @@ if __name__ == '__main__':
         budget_repo.add(Budget(amount=0, time="Неделя", budget=7000))
         budget_repo.add(Budget(amount=0, time="Месяц", budget=30000))
 
-    window = ExpensePresenter(view, category_repo, expense_repo, budget_repo)
+    window = Presenter(view, cat_view, category_repo, expense_repo, budget_repo)
     window.show()
     app.exec()

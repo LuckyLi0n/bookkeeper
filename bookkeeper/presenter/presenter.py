@@ -4,12 +4,14 @@ from datetime import datetime, timedelta
 
 from bookkeeper.models.expense import Expense
 from bookkeeper.models.budget import Budget
+from bookkeeper.models.category import Category
 
 
-class ExpensePresenter:
+class Presenter:
     """Связь компонентов View и Model"""
-    def __init__(self, view, cat_repo, exp_repo, budget_repo) -> None:
+    def __init__(self, view, cat_view, cat_repo, exp_repo, budget_repo) -> None:
         self.view = view
+        self.cat_view = cat_view
         self.exp_repo = exp_repo
         self.cat_repo = cat_repo
         self.budget_repo = budget_repo
@@ -19,7 +21,9 @@ class ExpensePresenter:
         self.b_day = self.budget_data[0].budget
         self.b_week = self.budget_data[1].budget
         self.b_month = self.budget_data[2].budget
-        self.view.on_expense_add_button_clicked(self.handle_expense_add_button_clicked)
+        self.view.on_expense_add_button_clicked(
+            self.handle_expense_add_button_clicked
+        )
         self.view.on_expense_delete_button_clicked(
             self.handle_expense_delete_button_clicked
         )
@@ -28,6 +32,18 @@ class ExpensePresenter:
         )
         self.view.on_budget_change_button_clicked(
             self.handle_budget_change_button_clicked
+        )
+        self.view.on_category_edit_button_clicked(
+            self.handle_category_edit_button_clicked
+        )
+        self.cat_view.on_category_add_button_clicked(
+            self.handle_category_add_button_clicked
+        )
+        self.cat_view.on_category_delete_button_clicked(
+            self.handle_category_delete_button_clicked
+        )
+        self.cat_view.on_category_change_button_clicked(
+            self.handle_category_change_button_clicked
         )
 
     def update_expense_data(self) -> None:
@@ -61,6 +77,18 @@ class ExpensePresenter:
                                        time="Месяц", budget=self.b_month, pk=3))
         self.view.set_budget_table(self.budget_repo.get_all())
 
+    def update_category_data(self) -> None:
+        """Обновляет отображаемую таблицу расходов в соответствии с базой данных"""
+        self.cat_data = self.cat_repo.get_all()
+        if self.cat_data:
+            for cat in self.cat_data:
+                for sub_cat in self.cat_data:
+                    if sub_cat.parent == cat.pk:
+                        sub_cat.parent = cat.name
+            self.cat_view.set_category_table(self.cat_data)
+            self.cat_view.set_category_dropdown(self.cat_data)
+            self.view.set_category_dropdown(self.cat_data)
+
     def show(self) -> None:
         """Вызывает отображение главного окна"""
         self.view.show()
@@ -89,7 +117,7 @@ class ExpensePresenter:
         Удаление последней записи из таблицы отображается
         только при перезапуске программы
         """
-        selected = self.view.get_selected_expenses(self.exp_repo.get_all())
+        selected = self.view.get_selected(self.exp_repo.get_all())
         if selected:
             for pk in selected:
                 self.exp_repo.delete(pk)
@@ -102,12 +130,12 @@ class ExpensePresenter:
         соответствующую запись и вызывает обновление таблиц.
         """
         cat_pk = self.view.get_selected_cat()
-        amount = int(self.view.get_amount())
+        amount = self.view.get_amount()
         comment = self.view.get_comment()
         date = f'{(self.view.get_selected_date()):%Y-%m-%d}'
         select = self.view.get_selected(self.exp_repo.get_all())
         if select:
-            exp = Expense(int(amount), cat_pk, expense_date=date,
+            exp = Expense(amount, cat_pk, expense_date=date,
                           comment=comment, pk=select[0])
             self.exp_repo.update(exp)
             self.update_expense_data()
@@ -118,7 +146,7 @@ class ExpensePresenter:
         При нажатии на кнопку "Изменить Бюджет" изменяет бюджет
         на определенный промежуток времени.
         """
-        budget_sum = int(self.view.get_amount())
+        budget_sum = self.view.get_amount()
         select = self.view.get_selected(self.budget_repo.get_all())
         if select:
             select = select[0]
@@ -129,3 +157,32 @@ class ExpensePresenter:
             elif select == 3:
                 self.b_month = budget_sum
         self.update_budget_data()
+
+    def handle_category_edit_button_clicked(self):
+        self.update_category_data()
+
+        self.cat_view.show()
+
+    def handle_category_add_button_clicked(self) -> None:
+        new_cat_name = self.cat_view.get_cat_name()
+        parent_cat_pk = self.cat_view.get_selected_cat()
+        cat = Category(name=new_cat_name, parent=parent_cat_pk)
+        self.cat_repo.add(cat)
+        self.update_category_data()
+
+    def handle_category_delete_button_clicked(self) -> None:
+        selected = self.cat_view.get_selected(self.cat_repo.get_all())
+        if selected:
+            for pk in selected:
+                self.cat_repo.delete(pk)
+        self.update_category_data()
+
+    def handle_category_change_button_clicked(self) -> None:
+        new_cat_name = self.cat_view.get_cat_name()
+        parent_cat_pk = self.cat_view.get_selected_cat()
+        select = self.cat_view.get_selected(self.cat_repo.get_all())
+        if select:
+            cat = Category(name=new_cat_name, parent=parent_cat_pk, pk=select[0])
+            self.cat_repo.update(cat)
+            self.update_category_data()
+            

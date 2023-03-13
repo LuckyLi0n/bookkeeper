@@ -18,7 +18,10 @@ class MainWindow(QtWidgets.QMainWindow):
         super().__init__()
 
         self.item_model = None
+
         self.width = 600
+        self.height = 800
+        self.setFixedSize(self.width, self.height)
 
         self.setWindowTitle("Программа для ведения бюджета")
 
@@ -73,7 +76,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.budget_change_button.setToolTip(
             'Введи в поле "Сумма" новый бюджет\n'
             'Выдели строку в которой хочешь заменить бюджет\n'
-            'Чтобы выделить строки нажимай на их номера')
+            'Чтобы выделить строку нажми на ее номер')
+
+        self.category_edit_button = QPushButton('Редактировать \n Категории')
+        self.bottom_controls.addWidget(self.category_edit_button, 2, 2)
+        self.category_edit_button.setToolTip(
+            'Нажми, если хочешь изменить список категорий')
 
         self.bottom_widget = QWidget()
         self.bottom_widget.setLayout(self.bottom_controls)
@@ -95,7 +103,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.expenses_grid.setColumnWidth(3, 240)
 
     def set_budget_table(self, data) -> None:
-        """Создает таблицу расходов"""
+        """Создает таблицу бюджета"""
         if data:
             self.item_model = TableModel(data)
             self.budget_grid.setModel(self.item_model)
@@ -104,10 +112,10 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.budget_grid.setColumnWidth(num, (self.width-40)//3)
                 self.budget_grid.setRowHeight(1, 30)
             self.budget_grid.setMaximumHeight(120)
-            self.setFixedSize(self.width, 600)
 
     def set_category_dropdown(self, data) -> None:
         """Отвечает за выпадающий список категорий"""
+        self.category_dropdown.clear()
         for obj in data:
             self.category_dropdown.addItem(obj.name, obj.pk)
 
@@ -127,9 +135,12 @@ class MainWindow(QtWidgets.QMainWindow):
         """Отвечает за вызов определенной функции при нажатии кнопки "Изменить Бюджет" """
         self.budget_change_button.clicked.connect(slot)
 
+    def on_category_edit_button_clicked(self, slot):
+        self.category_edit_button.clicked.connect(slot)
+
     def get_amount(self) -> float:
         """Возвращает введенную пользователем сумму"""
-        return float(self.amount_line_edit.text())
+        return int(self.amount_line_edit.text())
 
     def get_comment(self) -> str:
         """Возвращает напечатанный пользователем комментарий"""
